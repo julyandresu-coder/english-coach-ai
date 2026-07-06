@@ -1,0 +1,139 @@
+[
+  {
+    "id": "unit1_scene1",
+    "unit": 1,
+    "title": "Photo Album Memory Conversation",
+    "world": "Childhood memories",
+    "grammar": ["Past Simple", "Used to"],
+    "scenario": {
+      "location": "living room",
+      "object": "photo album",
+      "characters": ["Friend A", "User"],
+      "emotion": "nostalgia",
+      "goal": "talk about past experiences"
+    },
+    "flow": [
+      {
+        "speaker": "Friend A",
+        "text": "Oh, hey! This is my old photo album. I found it in my attic yesterday."
+      },
+      {
+        "speaker": "User",
+        "type": "prompt",
+        "instruction": "Ask about one of the photos"
+      },
+      {
+        "speaker": "Friend A",
+        "type": "dynamic",
+        "behavior": "respond naturally about childhood memories"
+      }
+    ],
+    "learning_focus": [
+      "Past Simple",
+      "Used to",
+      "Asking about past events"
+    ]
+  },
+  {
+    "id": "unit1_scene2",
+    "unit": 1,
+    "title": "The High School Reunion",
+    "world": "School days and catching up",
+    "grammar": ["Past Simple", "Used to"],
+    "scenario": {
+      "location": "school gymnasium",
+      "object": "yearbook",
+      "characters": ["Former Classmate", "User"],
+      "emotion": "surprise and excitement",
+      "goal": "discuss what people did after graduation and how they changed"
+    },
+    "flow": [
+      {
+        "speaker": "Former Classmate",
+        "text": "I can't believe it's been so long! You look exactly the same. Did you move out of the city after graduation?"
+      },
+      {
+        "speaker": "User",
+        "type": "prompt",
+        "instruction": "Answer where you went and ask what they did."
+      },
+      {
+        "speaker": "Former Classmate",
+        "type": "dynamic",
+        "behavior": "share a surprising story about a past job or travel"
+      }
+    ],
+    "learning_focus": [
+      "Past Simple (regular/irregular)",
+      "Narrating sequential events"
+    ]
+  },
+  {
+    "id": "unit1_scene3",
+    "unit": 1,
+    "title": "The Job Interview",
+    "world": "Professional background",
+    "grammar": ["Past Simple"],
+    "scenario": {
+      "location": "modern office",
+      "object": "resume (CV)",
+      "characters": ["Strict Interviewer", "User (Applicant)"],
+      "emotion": "professional and slightly nervous",
+      "goal": "explain previous work experience clearly"
+    },
+    "flow": [
+      {
+        "speaker": "Strict Interviewer",
+        "text": "Thank you for coming. I was looking at your resume. Tell me, why did you leave your last job?"
+      },
+      {
+        "speaker": "User",
+        "type": "prompt",
+        "instruction": "Explain a reason in the past simple."
+      },
+      {
+        "speaker": "Strict Interviewer",
+        "type": "dynamic",
+        "behavior": "ask follow-up questions about specific past projects"
+      }
+    ],
+    "learning_focus": [
+      "Past Simple",
+      "Professional vocabulary"
+    ]
+  },
+  {
+    "id": "unit1_scene4",
+    "unit": 1,
+    "title": "The Police Report",
+    "world": "Crime and witnesses",
+    "grammar": ["Past Simple", "Past Continuous"],
+    "scenario": {
+      "location": "police station",
+      "object": "notepad",
+      "characters": ["Detective", "User (Witness)"],
+      "emotion": "serious and detailed",
+      "goal": "reconstruct a timeline of events from yesterday"
+    },
+    "flow": [
+      {
+        "speaker": "Detective",
+        "text": "Please sit down. I need you to tell me exactly what you saw yesterday at 8:00 PM near the bank."
+      },
+      {
+        "speaker": "User",
+        "type": "prompt",
+        "instruction": "Describe what you were doing and what happened."
+      },
+      {
+        "speaker": "Detective",
+        "type": "dynamic",
+        "behavior": "press for more specific details about the suspect's actions"
+      }
+    ],
+    "learning_focus": [
+      "Past Simple (interrogative and affirmative)",
+      "Describing sequences"
+    ]
+  }
+]

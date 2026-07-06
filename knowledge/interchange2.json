@@ -1,0 +1,358 @@
+{
+  "book": "Interchange 2",
+  "target_level": "A2-B1",
+  "units": {
+    "unit_1": {
+      "theme": "Good Memories (Childhood and past experiences)",
+      "communicative_intentions": [
+        "Narrate past experiences",
+        "Ask and answer questions about the past",
+        "Share personal memories"
+      ],
+      "scenarios": [
+        {
+          "context": "Two friends looking at an old photo album.",
+          "characters": ["Friend A", "Friend B"],
+          "dynamic": "Sharing childhood anecdotes and nostalgia"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["family", "school", "memories", "life stages", "emotions"]
+      },
+      "implicit_grammar_tools": [
+        "Past simple (regular and irregular)",
+        "Used to (for past habits)"
+      ]
+    },
+    "unit_2": {
+      "theme": "Life in the City (Caught in the Rush)",
+      "communicative_intentions": [
+        "Describe urban problems",
+        "Ask for and give information/directions",
+        "Express opinions and propose solutions"
+      ],
+      "scenarios": [
+        {
+          "context": "A town hall meeting discussing traffic and public services.",
+          "characters": ["Concerned Citizen", "City Official"],
+          "dynamic": "Complaining about city life and suggesting improvements"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["transportation", "city places", "directions", "urban problems"]
+      },
+      "implicit_grammar_tools": [
+        "Quantifiers (too much, too many, enough, fewer, less, more)",
+        "Indirect questions"
+      ]
+    },
+    "unit_3": {
+      "theme": "Making Changes (Time for a Change!)",
+      "communicative_intentions": [
+        "Compare different living options",
+        "Express desires for the present",
+        "Talk about personal goals and lifestyle changes"
+      ],
+      "scenarios": [
+        {
+          "context": "Viewing a new apartment with a real estate agent.",
+          "characters": ["Potential Tenant", "Real Estate Agent"],
+          "dynamic": "Evaluating living spaces and expressing hypothetical wishes"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["houses", "apartments", "furniture", "lifestyles", "personal changes"]
+      },
+      "implicit_grammar_tools": [
+        "Comparatives",
+        "Wish (for present hypothetical situations)"
+      ]
+    },
+    "unit_4": {
+      "theme": "Have You Ever Tried It? (Food and cooking)",
+      "communicative_intentions": [
+        "Talk about food likes and dislikes",
+        "Describe a favorite snack",
+        "Give step-by-step cooking instructions"
+      ],
+      "scenarios": [
+        {
+          "context": "Teaching a friend how to cook a favorite family recipe.",
+          "characters": ["Home Cook", "Curious Friend"],
+          "dynamic": "Explaining a recipe step by step and reacting to tasting it"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["food", "recipes", "cooking methods", "kitchen items", "flavors"]
+      },
+      "implicit_grammar_tools": [
+        "Simple past vs. present perfect",
+        "Sequence adverbs (first, then, next, after that, finally)"
+      ]
+    },
+    "unit_5": {
+      "theme": "Hit the Road! (Travel and vacations)",
+      "communicative_intentions": [
+        "Describe vacation plans",
+        "Give travel advice",
+        "Plan a trip"
+      ],
+      "scenarios": [
+        {
+          "context": "Two friends planning an upcoming vacation together.",
+          "characters": ["Trip Planner", "Traveling Friend"],
+          "dynamic": "Deciding on plans and giving advice about what to pack or do"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["travel", "airport", "vacations", "packing", "destinations"]
+      },
+      "implicit_grammar_tools": [
+        "Future with be going to and will",
+        "Modals for necessity and suggestion (must, need to, don't have to, ought to, 'd better, should)"
+      ]
+    },
+    "unit_6": {
+      "theme": "Sure! I'll Do It. (Requests and favors)",
+      "communicative_intentions": [
+        "Make, agree to, and refuse requests",
+        "Complain about a situation",
+        "Apologize and give excuses"
+      ],
+      "scenarios": [
+        {
+          "context": "Roommates dividing household chores and negotiating favors.",
+          "characters": ["Roommate A", "Roommate B"],
+          "dynamic": "Requesting help, negotiating chores, and apologizing for not doing them"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["household chores", "favors", "excuses", "apologies"]
+      },
+      "implicit_grammar_tools": [
+        "Two-part verbs (phrasal verbs)",
+        "Will for responding to requests",
+        "Requests with modals and Would you mind...?"
+      ]
+    },
+    "unit_7": {
+      "theme": "What Do You Use This For? (Technology)",
+      "communicative_intentions": [
+        "Describe technology and gadgets",
+        "Give instructions and suggestions"
+      ],
+      "scenarios": [
+        {
+          "context": "Explaining how to use a new gadget to someone unfamiliar with it.",
+          "characters": ["Tech-Savvy Friend", "Confused User"],
+          "dynamic": "Giving step-by-step instructions and suggestions for using technology"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["technology", "gadgets", "apps", "instructions"]
+      },
+      "implicit_grammar_tools": [
+        "Infinitives and gerunds for uses and purposes",
+        "Imperatives and infinitives for giving suggestions"
+      ]
+    },
+    "unit_8": {
+      "theme": "Time to Celebrate! (Holidays and customs)",
+      "communicative_intentions": [
+        "Describe special events and holidays",
+        "Explain customs and traditions"
+      ],
+      "scenarios": [
+        {
+          "context": "Explaining a favorite holiday tradition to a foreign exchange student.",
+          "characters": ["Local Host", "Exchange Student"],
+          "dynamic": "Describing customs, festivals, and what happens during celebrations"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["holidays", "festivals", "traditions", "celebrations"]
+      },
+      "implicit_grammar_tools": [
+        "Relative clauses of time",
+        "Adverbial clauses of time using when, after, before"
+      ]
+    },
+    "unit_9": {
+      "theme": "Only Time Will Tell. (Past, present, and future changes)",
+      "communicative_intentions": [
+        "Talk about change over time",
+        "Compare different time periods",
+        "Describe potential consequences"
+      ],
+      "scenarios": [
+        {
+          "context": "Two neighbors discussing how their town has changed over the years.",
+          "characters": ["Longtime Resident", "New Neighbor"],
+          "dynamic": "Comparing the past to the present and predicting future consequences"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["change", "time periods", "consequences", "predictions"]
+      },
+      "implicit_grammar_tools": [
+        "Time contrasts",
+        "Conditional sentences with if clauses"
+      ]
+    },
+    "unit_10": {
+      "theme": "I Like Working with People. (Skills and careers)",
+      "communicative_intentions": [
+        "Describe skills and abilities",
+        "Talk about job preferences",
+        "Describe personality traits"
+      ],
+      "scenarios": [
+        {
+          "context": "A mock job interview discussing skills and career interests.",
+          "characters": ["Job Interviewer", "Job Candidate"],
+          "dynamic": "Discussing abilities, job preferences, and personality fit for a role"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["skills", "jobs", "careers", "personality traits"]
+      },
+      "implicit_grammar_tools": [
+        "Gerunds",
+        "Short responses",
+        "Clauses with because"
+      ]
+    },
+    "unit_11": {
+      "theme": "It's Really Worth Seeing! (Landmarks and world knowledge)",
+      "communicative_intentions": [
+        "Talk about monuments and landmarks",
+        "Describe countries",
+        "Discuss world facts"
+      ],
+      "scenarios": [
+        {
+          "context": "A tour guide describing a famous landmark to visiting tourists.",
+          "characters": ["Tour Guide", "Tourist"],
+          "dynamic": "Describing a monument's history and answering questions about it"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["landmarks", "monuments", "countries", "world facts"]
+      },
+      "implicit_grammar_tools": [
+        "Passive with by (simple past)",
+        "Passive without by (simple present)"
+      ]
+    },
+    "unit_12": {
+      "theme": "It's a Long Story. (Storytelling and recent events)",
+      "communicative_intentions": [
+        "Describe recent experiences",
+        "Discuss someone's recent activities",
+        "Tell a story about an unexpected event"
+      ],
+      "scenarios": [
+        {
+          "context": "Catching up with a friend after a wild, unexpected day.",
+          "characters": ["Storyteller", "Curious Listener"],
+          "dynamic": "Narrating a recent unexpected event in detail"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["recent events", "storytelling", "surprises", "daily activities"]
+      },
+      "implicit_grammar_tools": [
+        "Past continuous vs. simple past",
+        "Present perfect continuous"
+      ]
+    },
+    "unit_13": {
+      "theme": "That's Entertainment! (Movies, books, and opinions)",
+      "communicative_intentions": [
+        "Describe movies and books",
+        "Talk about actors",
+        "Give reactions and opinions"
+      ],
+      "scenarios": [
+        {
+          "context": "Two friends deciding what movie to watch and debating opinions on actors.",
+          "characters": ["Movie Buff", "Casual Viewer"],
+          "dynamic": "Recommending movies/books and reacting with opinions"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["movies", "books", "actors", "opinions", "reactions"]
+      },
+      "implicit_grammar_tools": [
+        "Participles as adjectives",
+        "Relative pronouns for people and things"
+      ]
+    },
+    "unit_14": {
+      "theme": "Now I Get It! (Nonverbal communication and gestures)",
+      "communicative_intentions": [
+        "Interpret body language",
+        "Explain gestures",
+        "Describe acceptable or prohibited behavior",
+        "Ask about the meaning of signs"
+      ],
+      "scenarios": [
+        {
+          "context": "Explaining local gestures and social norms to a visitor from another country.",
+          "characters": ["Local Resident", "Visitor"],
+          "dynamic": "Interpreting gestures and clarifying what behavior is allowed or not"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["body language", "gestures", "signs", "social norms"]
+      },
+      "implicit_grammar_tools": [
+        "Modals and adverbs (might, may, could, must, maybe, perhaps, probably, definitely)",
+        "Permission, obligation, and prohibition"
+      ]
+    },
+    "unit_15": {
+      "theme": "I Wouldn't Have Done That. (Money, hopes, and speculation)",
+      "communicative_intentions": [
+        "Speculate about the past and future",
+        "Describe a difficult situation",
+        "Give advice"
+      ],
+      "scenarios": [
+        {
+          "context": "A friend asking for advice after making a costly financial mistake.",
+          "characters": ["Friend Seeking Advice", "Advice-Giving Friend"],
+          "dynamic": "Speculating about what should have been done and giving advice for the future"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["money", "predicaments", "hopes", "speculation", "advice"]
+      },
+      "implicit_grammar_tools": [
+        "Unreal conditional sentences with if clauses",
+        "Past modals"
+      ]
+    },
+    "unit_16": {
+      "theme": "Making Excuses (Requests, excuses, and invitations)",
+      "communicative_intentions": [
+        "Report what others said",
+        "Make polite requests",
+        "Make invitations and excuses"
+      ],
+      "scenarios": [
+        {
+          "context": "Declining a friend's invitation and reporting what someone else said about it later.",
+          "characters": ["Invitee", "Friend Reporting the Conversation"],
+          "dynamic": "Making an excuse, then retelling the conversation to someone else using reported speech"
+        }
+      ],
+      "vocabulary_clusters": {
+        "core_topics": ["invitations", "excuses", "requests", "reported speech"]
+      },
+      "implicit_grammar_tools": [
+        "Reported speech for requests and statements"
+      ]
+    }
+  }
+}
