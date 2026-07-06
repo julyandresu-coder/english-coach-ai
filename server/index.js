@@ -6,6 +6,7 @@ const path = require('path');
 const { orchestrator, addTurnToHistory } = require('./core/orchestrator.js');
 const { checkErrors } = require('./core/correctorEngine.js');
 const { generateRoleResponse } = require('./core/llmCore.js');
+const { analyzeSession } = require('./core/analyzerEngine.js'); // <-- IMPORTACIÓN DEL EVALUADOR
 
 // Módulo de Daily Coach — todos sus exports se importan una sola vez, aquí arriba.
 const {
@@ -91,6 +92,32 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error("Error en el servidor:", error);
     res.status(500).json({ error: "System error" });
+  }
+});
+
+// ==========================================
+// NUEVA RUTA: EVALUACIÓN Y CIERRE DE SESIÓN
+// ==========================================
+app.post('/api/evaluate', async (req, res) => {
+  try {
+      const { chatHistory } = req.body;
+      
+      if (!chatHistory || chatHistory.length === 0) {
+          return res.status(400).json({ error: "No chat history provided" });
+      }
+
+      // 1. La IA analiza la conversación completa
+      const evaluation = await analyzeSession(chatHistory);
+
+      // (Nota: En la Fase 3, aquí agregaremos el código para guardar 
+      // este 'evaluation' en Supabase, una vez tengamos el Login listo)
+
+      // 2. Enviamos el resultado estructurado al frontend
+      return res.json(evaluation);
+
+  } catch (error) {
+      console.error("Error en la evaluación:", error);
+      res.status(500).json({ error: "Error procesando el feedback" });
   }
 });
 

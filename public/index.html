@@ -6,48 +6,62 @@
     <title>English Coach AI</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Importamos Supabase para el Frontend -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-    <!-- NAV BAR PRINCIPAL -->
+    
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav id="main-nav" class="top-nav">
         <div class="nav-left">
             <button id="btn-home" class="btn-outline hidden">🏠 Home</button>
         </div>
         <div class="nav-right">
-            <button id="btn-nav-live" class="btn-outline">🎤 Live coach</button>
-            <button id="btn-nav-daily" class="btn-outline">📚 Daily Coach</button>
-            <button id="btn-nav-progress" class="btn-outline">📈 Progress</button>
+            <span id="user-email-display" style="color: white; margin-right: 15px; font-size: 0.9rem;"></span>
+            <button id="btn-nav-live" class="btn-outline hidden">🎤 Live coach</button>
+            <button id="btn-logout" class="btn-outline hidden" style="border-color: #ef4444; color: #ef4444;">Logout</button>
         </div>
     </nav>
 
     <!-- ==========================================
-         VISTA 1: LANDING HOME 
+         VISTA 0: LOGIN / REGISTRO
          ========================================== -->
-    <main id="view-home" class="view-container active">
+    <main id="view-auth" class="view-container active">
         <div class="home-content">
-            <div class="badge">🔹 REAL-LIFE LANGUAGE SIMULATION</div>
             <h1 class="logo-title">English Coach <span class="text-gradient">AI</span></h1>
-            <p class="subtitle">Turn what you studied today into <span class="italic-serif">real-life conversations.</span></p>
-
-            <div class="main-input-container">
-                <input type="text" id="home-input" placeholder="What did you study today? (e.g. Present Perfect, Unit 5, Travel)">
-                <button id="btn-start-exp" class="btn-primary">Start Experience ➔</button>
-            </div>
-            <p class="micro-text">You will enter a real-life English simulation.</p>
-
-            <div class="topic-pills">
-                <button class="pill">Present Perfect</button>
-                <button class="pill">Unit 5 - Travel</button>
-                <button class="pill">Ordering coffee</button>
-                <button class="pill">Job interview</button>
-                <button class="pill">Catching up with a friend</button>
+            <p class="subtitle">Inicia sesión para guardar tu progreso</p>
+            
+            <div class="auth-card glass-card" style="max-width: 400px; margin: 0 auto; padding: 30px;">
+                <input type="email" id="auth-email" class="dark-input" placeholder="Tu correo electrónico" style="margin-bottom: 15px; width: 100%;">
+                <input type="password" id="auth-password" class="dark-input" placeholder="Tu contraseña" style="margin-bottom: 20px; width: 100%;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <button id="btn-login" class="btn-primary" style="flex: 1;">Ingresar</button>
+                    <button id="btn-register" class="btn-secondary" style="flex: 1; background: transparent; border: 1px solid white; color: white;">Registrarse</button>
+                </div>
+                <div id="auth-message" style="margin-top: 15px; color: #ff9999; font-size: 0.9rem;"></div>
             </div>
         </div>
     </main>
 
     <!-- ==========================================
-         VISTA 2: CHAT (ROLEPLAY)
+         VISTA 1: LANDING HOME 
+         ========================================== -->
+    <main id="view-home" class="view-container hidden">
+        <div class="home-content">
+            <div class="badge">🔹 REAL-LIFE LANGUAGE SIMULATION</div>
+            <h1 class="logo-title">English Coach <span class="text-gradient">AI</span></h1>
+            <p class="subtitle">Turn what you studied today into <span class="italic-serif">real-life conversations.</span></p>
+            
+            <div class="main-input-container">
+                <input type="text" id="home-input" placeholder="What did you study today? (e.g. Present Perfect)">
+                <button id="btn-start-exp" class="btn-primary">Start Experience ➔</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         VISTA 2: ROLEPLAY (Práctica interactiva escrita)
          ========================================== -->
     <main id="view-chat" class="view-container hidden">
         <div class="chat-container">
@@ -57,8 +71,14 @@
                     <input type="text" id="chat-input" class="dark-input" placeholder="Respond in character...">
                     <button id="btn-send-chat" class="btn-primary">Send</button>
                 </div>
+                <!-- NUEVO BOTÓN PARA FINALIZAR SESIÓN -->
+                <div style="text-align: center; margin-top: 10px;">
+                    <button id="btn-end-session" class="btn-secondary" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                        🛑 End Simulation & Get Feedback
+                    </button>
+                </div>
             </div>
-
+            
             <div class="sidebar glass-card">
                 <h3 class="card-header">SCENARIO</h3>
                 <div id="side-focus" style="color: white; font-size: 1.2rem; font-family: 'Playfair Display', serif;">Loading...</div>
@@ -67,110 +87,56 @@
     </main>
 
     <!-- ==========================================
-         VISTA 3: LIVE COACH (MODO GAMER)
+         VISTA 3: LIVE COACH (Auditor Pasivo Gamer)
          ========================================== -->
     <main id="view-live" class="view-container hidden">
         <header class="view-header">
-            <button class="btn-back">←</button>
             <div class="header-titles">
                 <span class="header-subtitle">LIVE COACH</span>
                 <h2 class="header-title">Speak English while you game</h2>
             </div>
-            <div class="status-badge">● EN PAUSA</div>
         </header>
 
         <div class="live-grid">
             <div class="live-left">
                 <div class="glass-card card-mic-area">
-                    <div class="card-header">🎮 CONTEXTO DE TU PARTIDA</div>
+                    <h3 class="card-header">🎮 CONTEXTO DE TU PARTIDA</h3>
                     <input type="text" id="live-context" class="dark-input" value="Playing Valorant with friends">
-
-                    <div class="mic-container">
-                        <button id="btn-live-mic" class="mic-button">🎤</button>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button id="btn-start-listening" class="btn-primary btn-center" style="padding: 15px 30px; font-size: 1.1rem;">
+                            🎤 Empezar a escuchar
+                        </button>
                     </div>
-                    <button id="btn-start-listening" class="btn-primary btn-center">🎤 Empezar a escuchar</button>
-                    <p class="micro-text center-text">Habla en inglés como si le estuvieras hablando a tus teammates. Cada ~5s se transcribe, y cada ~8s recibes correcciones.</p>
                 </div>
 
                 <div class="glass-card card-transcription">
-                    <div class="card-header">LO QUE DIJISTE</div>
+                    <h3 class="card-header">LO QUE DIJISTE</h3>
                     <div id="live-transcription" class="transcription-box">
-                        Tu transcripción aparecerá aquí en vivo...
+                        Tu transcripción en vivo aparecerá aquí...
                     </div>
                 </div>
             </div>
 
             <div class="live-right glass-card">
-                <div class="card-header">CORRECCIONES EN VIVO</div>
+                <h3 class="card-header">CORRECCIONES EN VIVO</h3>
                 <div id="live-corrections" class="corrections-box">
-                    Cuando empieces a hablar, aquí aparecerán las cosas más importantes a corregir — sin sermones, solo la versión natural.
+                    Cuando empieces a hablar, aquí aparecerán las correcciones teniendo en cuenta tu contexto...
                 </div>
             </div>
         </div>
     </main>
 
     <!-- ==========================================
-         VISTA 4: DAILY COACH
+         MODAL DE RESULTADOS (Oculto por defecto)
          ========================================== -->
-    <main id="view-daily" class="view-container hidden">
-        <header class="view-header">
-            <button class="btn-back" id="btn-back-daily">←</button>
-            <div class="header-titles">
-                <span class="header-subtitle">DAILY COACH</span>
-                <h2 class="header-title">What did you study today?</h2>
-            </div>
-        </header>
-
-        <div id="daily-intro" class="glass-card">
-            <div class="card-header">TELL ME WHAT YOU STUDIED</div>
-            <div class="main-input-container">
-                <input type="text" id="daily-input" placeholder="e.g. Unit 5, Present Perfect, comparatives...">
-                <button id="btn-start-daily" class="btn-primary">Start class ➔</button>
-            </div>
+    <div id="feedback-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+        <div class="glass-card" style="max-width: 600px; width: 90%; padding: 30px; max-height: 90vh; overflow-y: auto;">
+            <h2 style="color: white; margin-bottom: 20px;">📊 Session Results</h2>
+            <div id="modal-content" style="color: white;">Analizando tu conversación...</div>
+            <button id="btn-close-modal" class="btn-primary" style="margin-top: 20px; width: 100%;">Cerrar y Volver al Inicio</button>
         </div>
-
-        <div id="daily-chat-container" class="chat-container hidden">
-            <div class="chat-main glass-card">
-                <div id="daily-chat-history" class="chat-history"></div>
-                <div class="input-area">
-                    <input type="text" id="daily-chat-input" class="dark-input" placeholder="Respond to your coach...">
-                    <button id="btn-send-daily" class="btn-primary">Send</button>
-                </div>
-            </div>
-            <div class="sidebar glass-card">
-                <h3 class="card-header">TODAY'S UNIT</h3>
-                <div id="daily-side-unit" style="color:white; font-size:1.2rem; font-family:'Playfair Display', serif;">—</div>
-            </div>
-        </div>
-    </main>
-
-    <!-- ==========================================
-         VISTA 5: PROGRESS
-         ========================================== -->
-    <main id="view-progress" class="view-container hidden">
-        <header class="view-header">
-            <button class="btn-back">←</button>
-            <h2 class="header-title serif-title">Progress</h2>
-        </header>
-
-        <div class="progress-layout">
-            <div class="glass-card card-confidence">
-                <div class="card-header">🔥 CONFIDENCE</div>
-                <div class="confidence-score"><span class="score-number">0%</span> <span class="score-text">and rising</span></div>
-                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 5%;"></div></div>
-                <p class="micro-text">You're not studying — you're living conversations. Every scene brings you closer to speaking naturally.</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="glass-card"><div class="card-header">🧩 SCENARIOS EXPERIENCED</div><div class="stat-number">0</div></div>
-                <div class="glass-card"><div class="card-header">🏆 UNIQUE UNITS</div><div class="stat-number">0</div></div>
-                <div class="glass-card"><div class="card-header">⏱️ MOST RECENT</div><div class="stat-number">—</div></div>
-            </div>
-
-            <div class="glass-card"><div class="card-header">COMMON THEMES</div><div class="empty-state">No scenes yet — <a>start your first experience.</a></div></div>
-            <div class="glass-card"><div class="card-header">RECENT SCENES</div><div class="empty-state">No scenes yet — <a>start your first experience.</a></div></div>
-        </div>
-    </main>
+    </div>
 
     <script src="app.js"></script>
 </body>

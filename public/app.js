@@ -1,47 +1,98 @@
+// ==========================================
+// 1. CONFIGURACIÓN DE SUPABASE (FRONTEND)
+// ==========================================
+// REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS REALES DE SUPABASE
+// (Los mismos que pusiste en el archivo .env)
+const SUPABASE_URL = 'https://crvozlqlysmmgtfjueug.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'sb_publishable_4R08nzHsEtTcqMBOTy5zfQ_uUH2fysK';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// --- ESTADO GLOBAL ---
+let chatHistory = []; // Aquí guardaremos la charla para evaluarla al final
+let currentTopic = ""; // Para saber de qué se trató la sesión
+let currentUser = null; // Para saber quién está logueado
+
 // --- REFERENCIAS DOM ---
+const viewAuth = document.getElementById('view-auth');
 const viewHome = document.getElementById('view-home');
 const viewChat = document.getElementById('view-chat');
 const viewLive = document.getElementById('view-live');
-const viewDaily = document.getElementById('view-daily');
-const btnHome = document.getElementById('btn-home');
+const modal = document.getElementById('feedback-modal');
 
-// --- SISTEMA DE NAVEGACIÓN ---
+const btnHome = document.getElementById('btn-home');
+const btnNavLive = document.getElementById('btn-nav-live');
+const btnLogout = document.getElementById('btn-logout');
+const userEmailDisplay = document.getElementById('user-email-display');
+
+// ==========================================
+// 2. SISTEMA DE NAVEGACIÓN Y AUTENTICACIÓN
+// ==========================================
 function showView(view) {
+    viewAuth.classList.add('hidden');
     viewHome.classList.add('hidden');
     viewChat.classList.add('hidden');
     viewLive.classList.add('hidden');
-    viewDaily.classList.add('hidden');
     view.classList.remove('hidden');
-    btnHome.classList.toggle('hidden', view === viewHome);
+    
+    // Solo mostrar menú superior si estamos logueados
+    const isLoggedIn = !!currentUser;
+    btnHome.classList.toggle('hidden', !isLoggedIn || view === viewHome);
+    btnNavLive.classList.toggle('hidden', !isLoggedIn);
+    btnLogout.classList.toggle('hidden', !isLoggedIn);
 }
 
-document.getElementById('btn-nav-live').addEventListener('click', () => showView(viewLive));
-
-document.getElementById('btn-nav-daily').addEventListener('click', () => {
-    showView(viewDaily);
-    document.getElementById('daily-intro').classList.remove('hidden');
-    document.getElementById('daily-chat-container').classList.add('hidden');
-    document.getElementById('daily-chat-history').innerHTML = '';
-    document.getElementById('daily-input').value = '';
+// Escuchar cambios en la sesión de Supabase
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+        currentUser = session.user;
+        userEmailDisplay.innerText = currentUser.email;
+        showView(viewHome);
+    } else {
+        currentUser = null;
+        userEmailDisplay.innerText = "";
+        showView(viewAuth);
+    }
 });
 
-document.getElementById('btn-back-daily').addEventListener('click', () => showView(viewHome));
+// Botones de Autenticación
+const emailInput = document.getElementById('auth-email');
+const passInput = document.getElementById('auth-password');
+const authMsg = document.getElementById('auth-message');
+
+document.getElementById('btn-register').addEventListener('click', async () => {
+    authMsg.innerText = "Registrando...";
+    const { error } = await supabase.auth.signUp({ email: emailInput.value, password: passInput.value });
+    authMsg.innerText = error ? `Error: ${error.message}` : "¡Registro exitoso! Revisa tu correo o inicia sesión.";
+});
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+    authMsg.innerText = "Ingresando...";
+    const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passInput.value });
+    if (error) authMsg.innerText = `Error: ${error.message}`;
+});
+
+btnLogout.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+});
 
 btnHome.addEventListener('click', () => showView(viewHome));
+btnNavLive.addEventListener('click', () => showView(viewLive));
 
 // ==========================================
-// FLUJO 1: ROLEPLAY (Práctica interactiva)
+// 3. FLUJO 1: ROLEPLAY (Práctica interactiva)
 // ==========================================
 const homeInput = document.getElementById('home-input');
-const chatHistory = document.getElementById('chat-history');
+const chatDiv = document.getElementById('chat-history');
 const chatInput = document.getElementById('chat-input');
 
 document.getElementById('btn-start-exp').addEventListener('click', () => {
-    const topic = homeInput.value.trim();
-    if (topic) {
+    currentTopic = homeInput.value.trim();
+    if (currentTopic) {
         showView(viewChat);
-        chatHistory.innerHTML = ''; 
-        sendChatMessage(`I want to practice: ${topic}`, true);
+        chatDiv.innerHTML = ''; 
+        chatHistory = []; // Reiniciamos el historial
+        sendChatMessage(`I want to practice: ${currentTopic}`, true);
     }
 });
 
@@ -50,29 +101,33 @@ chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatM
 
 async function sendChatMessage(text, isInit = false) {
     if (!text.trim()) return;
-
+    
     if (!isInit) {
-        chatHistory.innerHTML += `<div class="msg-user">${text}</div>`;
+        chatDiv.innerHTML += `<div class="msg-user">${text}</div>`;
         chatInput.value = '';
     }
 
+    // Guardamos tu mensaje en el historial temporal
+    chatHistory.push({ role: 'user', content: text });
+
     try {
-        // FIX: ruta relativa. Antes: 'http://localhost:3001/api/chat'.
-        // Así funciona igual en local que en producción (Render, etc.),
-        // porque siempre apunta al mismo host que sirvió la página.
-        const response = await fetch('/api/chat', {
+        const response = await fetch('/api/chat', { // NOTA: Ruta relativa para producción
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, mode: 'roleplay' })
+            body: JSON.stringify({ message: text, mode: 'daily_coach' }) // Usamos daily_coach como principal
         });
-
+        
         const data = await response.json();
-
+        
         if (data.correction) showToast(data.correction.explanation, data.correction.correction);
+        
+        const iaResponse = data.coachResponse || data.actorResponse;
+        chatDiv.innerHTML += `<div class="msg-actor"><strong>Coach:</strong> ${iaResponse}</div>`;
+        document.getElementById('side-focus').innerText = data.theme || currentTopic;
+        chatDiv.scrollTop = chatDiv.scrollHeight;
 
-        chatHistory.innerHTML += `<div class="msg-actor"><strong>Actor:</strong> ${data.actorResponse}</div>`;
-        document.getElementById('side-focus').innerText = data.theme;
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        // Guardamos la respuesta de la IA en el historial
+        chatHistory.push({ role: 'actor', content: iaResponse });
 
     } catch (e) {
         console.error(e);
@@ -80,7 +135,79 @@ async function sendChatMessage(text, isInit = false) {
 }
 
 // ==========================================
-// FLUJO 2: LIVE COACH (Auditor Pasivo)
+// 4. NUEVO FLUJO: EVALUAR Y GUARDAR
+// ==========================================
+document.getElementById('btn-end-session').addEventListener('click', async () => {
+    if (chatHistory.length < 3) {
+        alert("¡La conversación es muy corta para evaluarla! Habla un poco más.");
+        return;
+    }
+
+    // Mostrar modal
+    modal.classList.remove('hidden');
+    document.getElementById('modal-content').innerHTML = `
+        <div style="text-align: center; color: #9ca3af; padding: 20px;">
+            <h3>Procesando...</h3>
+            <p>La IA está analizando tu fluidez y detectando áreas de mejora.</p>
+        </div>`;
+
+    try {
+        // Pedimos al backend que evalúe
+        const response = await fetch('/api/evaluate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatHistory: chatHistory })
+        });
+        
+        const evalData = await response.json();
+
+        // 💾 GUARDAR EN SUPABASE
+        if (currentUser) {
+            await supabase.from('session_metrics').insert([{
+                user_id: currentUser.id,
+                topic: currentTopic,
+                estimated_level: evalData.estimated_level,
+                fluency_score: evalData.fluency_score,
+                common_errors: evalData.common_errors
+            }]);
+        }
+
+        // Mostrar resultados en el Modal
+        let html = `
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 1.5rem;">Nivel Estimado: <span style="color:#34d399">${evalData.estimated_level}</span></h3>
+                <h4 style="margin: 5px 0 0 0; color: #cbd5e1;">Puntuación de Fluidez: ${evalData.fluency_score} / 100</h4>
+            </div>
+            <h4 style="margin-bottom: 10px; color: #f87171;">⚠️ Oportunidades de Mejora:</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+        `;
+        
+        evalData.common_errors.forEach(err => {
+            html += `
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #f87171; border-radius: 5px;">
+                    <p style="margin: 0 0 5px 0; color: #ff9999;">❌ <i>"${err.error}"</i></p>
+                    <p style="margin: 0 0 5px 0; color: #34d399;">✅ <b>"${err.correction}"</b></p>
+                    <p style="margin: 0; font-size: 0.9rem; color: #9ca3af;">💡 ${err.explanation}</p>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        
+        document.getElementById('modal-content').innerHTML = html;
+
+    } catch (e) {
+        console.error(e);
+        document.getElementById('modal-content').innerHTML = `<p style="color:red">Hubo un error procesando tus resultados.</p>`;
+    }
+});
+
+document.getElementById('btn-close-modal').addEventListener('click', () => {
+    modal.classList.add('hidden');
+    showView(viewHome); // Volver al inicio al cerrar
+});
+
+// ==========================================
+// 5. FLUJO 2: LIVE COACH (Auditor Pasivo)
 // ==========================================
 const btnListen = document.getElementById('btn-start-listening');
 const transcriptionBox = document.getElementById('live-transcription');
@@ -110,21 +237,15 @@ recognition.onresult = async (event) => {
 
 async function checkLiveGrammar(text) {
     correctionsBox.innerHTML = "<i>Analizando gramática y contexto...</i>";
-
     const currentContext = document.getElementById('live-context')?.value || "General casual conversation";
 
     try {
-        // FIX: ruta relativa, igual que en sendChatMessage.
-        const response = await fetch('/api/chat', {
+        const response = await fetch('/api/chat', { // NOTA: Ruta relativa para producción
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message: text, 
-                mode: 'live_coach',
-                context: currentContext 
-            }) 
+            body: JSON.stringify({ message: text, mode: 'live_coach', context: currentContext }) 
         });
-
+        
         const data = await response.json();
         if (data.correction) {
             correctionsBox.innerHTML = `
@@ -136,62 +257,11 @@ async function checkLiveGrammar(text) {
         }
     } catch (e) {
         console.error(e);
-        correctionsBox.innerHTML = "<span style='color:red'>Error de conexión con la IA.</span>";
+        correctionsBox.innerHTML = "<span style='color:red'>Error de conexión.</span>";
     }
 }
 
-// ==========================================
-// FLUJO 3: DAILY COACH (Clase complementaria)
-// ==========================================
-const dailyInput = document.getElementById('daily-input');
-const dailyIntro = document.getElementById('daily-intro');
-const dailyChatContainer = document.getElementById('daily-chat-container');
-const dailyChatHistory = document.getElementById('daily-chat-history');
-const dailyChatInput = document.getElementById('daily-chat-input');
-const dailySideUnit = document.getElementById('daily-side-unit');
-
-document.getElementById('btn-start-daily').addEventListener('click', () => {
-    const topic = dailyInput.value.trim();
-    if (topic) {
-        dailyIntro.classList.add('hidden');
-        dailyChatContainer.classList.remove('hidden');
-        sendDailyMessage(`Today I studied: ${topic}`, true);
-    }
-});
-
-document.getElementById('btn-send-daily').addEventListener('click', () => sendDailyMessage(dailyChatInput.value));
-dailyChatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendDailyMessage(dailyChatInput.value); });
-
-async function sendDailyMessage(text, isInit = false) {
-    if (!text.trim()) return;
-
-    if (!isInit) {
-        dailyChatHistory.innerHTML += `<div class="msg-user">${text}</div>`;
-        dailyChatInput.value = '';
-    }
-
-    try {
-        // FIX: ruta relativa, igual que en los otros dos flujos.
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, mode: 'daily_coach' })
-        });
-
-        const data = await response.json();
-
-        if (data.correction) showToast(data.correction.explanation, data.correction.correction);
-
-        dailyChatHistory.innerHTML += `<div class="msg-actor"><strong>Coach:</strong> ${data.coachResponse}</div>`;
-        dailySideUnit.innerText = data.unit ? `Unit ${data.unit}: ${data.theme}` : (data.theme || "General Practice");
-        dailyChatHistory.scrollTop = dailyChatHistory.scrollHeight;
-
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-// Utilidad para notificaciones flotantes (compartida por Roleplay y Daily Coach)
+// Utilidad para notificaciones flotantes
 function showToast(exp, corr) {
     const t = document.createElement('div');
     t.className = 'feedback-toast';
