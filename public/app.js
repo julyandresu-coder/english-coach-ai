@@ -2,16 +2,15 @@
 // 1. CONFIGURACIÓN DE SUPABASE (FRONTEND)
 // ==========================================
 // REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS REALES DE SUPABASE
-// (Los mismos que pusiste en el archivo .env)
-const SUPABASE_URL = 'https://crvozlqlysmmgtfjueug.supabase.co/rest/v1/';
-const SUPABASE_ANON_KEY = 'sb_publishable_4R08nzHsEtTcqMBOTy5zfQ_uUH2fysK';
+const SUPABASE_URL = 'TU_URL_AQUI';
+const SUPABASE_ANON_KEY = 'TU_LLAVE_PUBLICA_AQUI';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- ESTADO GLOBAL ---
-let chatHistory = []; // Aquí guardaremos la charla para evaluarla al final
-let currentTopic = ""; // Para saber de qué se trató la sesión
-let currentUser = null; // Para saber quién está logueado
+let chatHistory = []; 
+let currentTopic = ""; 
+let currentUser = null; 
 
 // --- REFERENCIAS DOM ---
 const viewAuth = document.getElementById('view-auth');
@@ -35,15 +34,14 @@ function showView(view) {
     viewLive.classList.add('hidden');
     view.classList.remove('hidden');
     
-    // Solo mostrar menú superior si estamos logueados
     const isLoggedIn = !!currentUser;
     btnHome.classList.toggle('hidden', !isLoggedIn || view === viewHome);
     btnNavLive.classList.toggle('hidden', !isLoggedIn);
     btnLogout.classList.toggle('hidden', !isLoggedIn);
 }
 
-// Escuchar cambios en la sesión de Supabase
-supabase.auth.onAuthStateChange((event, session) => {
+// Escuchar cambios en la sesión usando supabaseClient
+supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session && session.user) {
         currentUser = session.user;
         userEmailDisplay.innerText = currentUser.email;
@@ -62,25 +60,25 @@ const authMsg = document.getElementById('auth-message');
 
 document.getElementById('btn-register').addEventListener('click', async () => {
     authMsg.innerText = "Registrando...";
-    const { error } = await supabase.auth.signUp({ email: emailInput.value, password: passInput.value });
+    const { error } = await supabaseClient.auth.signUp({ email: emailInput.value, password: passInput.value });
     authMsg.innerText = error ? `Error: ${error.message}` : "¡Registro exitoso! Revisa tu correo o inicia sesión.";
 });
 
 document.getElementById('btn-login').addEventListener('click', async () => {
     authMsg.innerText = "Ingresando...";
-    const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passInput.value });
+    const { error } = await supabaseClient.auth.signInWithPassword({ email: emailInput.value, password: passInput.value });
     if (error) authMsg.innerText = `Error: ${error.message}`;
 });
 
 btnLogout.addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
 });
 
 btnHome.addEventListener('click', () => showView(viewHome));
 btnNavLive.addEventListener('click', () => showView(viewLive));
 
 // ==========================================
-// 3. FLUJO 1: ROLEPLAY (Práctica interactiva)
+// 3. FLUJO 1: ROLEPLAY
 // ==========================================
 const homeInput = document.getElementById('home-input');
 const chatDiv = document.getElementById('chat-history');
@@ -91,7 +89,7 @@ document.getElementById('btn-start-exp').addEventListener('click', () => {
     if (currentTopic) {
         showView(viewChat);
         chatDiv.innerHTML = ''; 
-        chatHistory = []; // Reiniciamos el historial
+        chatHistory = [];
         sendChatMessage(`I want to practice: ${currentTopic}`, true);
     }
 });
@@ -107,14 +105,13 @@ async function sendChatMessage(text, isInit = false) {
         chatInput.value = '';
     }
 
-    // Guardamos tu mensaje en el historial temporal
     chatHistory.push({ role: 'user', content: text });
 
     try {
-        const response = await fetch('/api/chat', { // NOTA: Ruta relativa para producción
+        const response = await fetch('/api/chat', { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, mode: 'daily_coach' }) // Usamos daily_coach como principal
+            body: JSON.stringify({ message: text, mode: 'daily_coach' })
         });
         
         const data = await response.json();
@@ -126,7 +123,6 @@ async function sendChatMessage(text, isInit = false) {
         document.getElementById('side-focus').innerText = data.theme || currentTopic;
         chatDiv.scrollTop = chatDiv.scrollHeight;
 
-        // Guardamos la respuesta de la IA en el historial
         chatHistory.push({ role: 'actor', content: iaResponse });
 
     } catch (e) {
@@ -135,7 +131,7 @@ async function sendChatMessage(text, isInit = false) {
 }
 
 // ==========================================
-// 4. NUEVO FLUJO: EVALUAR Y GUARDAR
+// 4. FLUJO 2: EVALUAR Y GUARDAR
 // ==========================================
 document.getElementById('btn-end-session').addEventListener('click', async () => {
     if (chatHistory.length < 3) {
@@ -143,16 +139,10 @@ document.getElementById('btn-end-session').addEventListener('click', async () =>
         return;
     }
 
-    // Mostrar modal
     modal.classList.remove('hidden');
-    document.getElementById('modal-content').innerHTML = `
-        <div style="text-align: center; color: #9ca3af; padding: 20px;">
-            <h3>Procesando...</h3>
-            <p>La IA está analizando tu fluidez y detectando áreas de mejora.</p>
-        </div>`;
+    document.getElementById('modal-content').innerHTML = `<div style="text-align: center; color: #9ca3af; padding: 20px;"><h3>Procesando...</h3></div>`;
 
     try {
-        // Pedimos al backend que evalúe
         const response = await fetch('/api/evaluate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -161,9 +151,9 @@ document.getElementById('btn-end-session').addEventListener('click', async () =>
         
         const evalData = await response.json();
 
-        // 💾 GUARDAR EN SUPABASE
+        // GUARDAR EN SUPABASE usando supabaseClient
         if (currentUser) {
-            await supabase.from('session_metrics').insert([{
+            await supabaseClient.from('session_metrics').insert([{
                 user_id: currentUser.id,
                 topic: currentTopic,
                 estimated_level: evalData.estimated_level,
@@ -172,7 +162,6 @@ document.getElementById('btn-end-session').addEventListener('click', async () =>
             }]);
         }
 
-        // Mostrar resultados en el Modal
         let html = `
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                 <h3 style="margin: 0; font-size: 1.5rem;">Nivel Estimado: <span style="color:#34d399">${evalData.estimated_level}</span></h3>
@@ -192,7 +181,6 @@ document.getElementById('btn-end-session').addEventListener('click', async () =>
             `;
         });
         html += `</div>`;
-        
         document.getElementById('modal-content').innerHTML = html;
 
     } catch (e) {
@@ -203,11 +191,11 @@ document.getElementById('btn-end-session').addEventListener('click', async () =>
 
 document.getElementById('btn-close-modal').addEventListener('click', () => {
     modal.classList.add('hidden');
-    showView(viewHome); // Volver al inicio al cerrar
+    showView(viewHome);
 });
 
 // ==========================================
-// 5. FLUJO 2: LIVE COACH (Auditor Pasivo)
+// 5. FLUJO 3: LIVE COACH
 // ==========================================
 const btnListen = document.getElementById('btn-start-listening');
 const transcriptionBox = document.getElementById('live-transcription');
