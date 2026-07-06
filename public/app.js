@@ -2,8 +2,8 @@
 // 1. CONFIGURACIÓN DE SUPABASE (FRONTEND)
 // ==========================================
 // REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS REALES DE SUPABASE
-const SUPABASE_URL = 'TU_URL_AQUI';
-const SUPABASE_ANON_KEY = 'TU_LLAVE_PUBLICA_AQUI';
+const SUPABASE_URL = 'https://crvozlqlysmmgtfjueug.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_4R08nzHsEtTcqMBOTy5zfQ_uUH2fysK';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
