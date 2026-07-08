@@ -21,7 +21,7 @@ async function analyzeSession(chatHistory) {
         {
           "error": "phrase used",
           "correction": "correct phrase",
-          "explanation": "brief explanation in Spanish"
+          "explanation": "brief explanation in English"
         }
       ]
     }

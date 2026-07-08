@@ -2,65 +2,57 @@ const Groq = require('groq-sdk');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const { interpretTopic } = require('./topicInterpreter.js');
 
-// Sesión independiente del Roleplay — no comparten historial.
+// --- PROMPT DE RESPALDO (Por si falla la lógica de unidad) ---
+const NATURAL_APPROACH_FALLBACK = `
+You are a 'Natural Approach' Language Facilitator based on Stephen Krashen's theories. 
+1. Goal: Provide 'Comprehensible Input' (i+1). 
+2. Mirror Effect: If the student makes an error, don't correct them explicitly. Gently model the correct form in your reply.
+3. Be warm, conversational, and focus on communication, not grammar drilling.
+4. If you don't know the specific unit the student is studying, just have a natural, engaging conversation about their day.
+`;
+
 let dailyCoachSession = {
     unit: null,
     theme: "General Practice",
-    systemDirective: null,
+    systemDirective: NATURAL_APPROACH_FALLBACK, // Inicializado con respaldo
     history: []
 };
 
 function buildSystemDirective(unitData, rawInput) {
-    // CASO A: se reconoció la unidad/gramática en la base de conocimiento
-    if (unitData.found) {
+    if (unitData && unitData.found) {
         return `
 You are a complementary English communication coach, working alongside a formal academy course.
-The student studies grammar intensively at their academy (~5 hours/day). Your job is NOT to repeat
-grammar theory. Your job is to turn what they already studied into REAL, natural communication practice.
+The student studies grammar intensively (~5 hours/day). Do NOT repeat grammar theory.
+Turn what they already studied into REAL, natural communication practice.
 
-TODAY'S CONTENT (from Interchange 2, 5th Edition):
+TODAY'S CONTENT (Interchange 2):
 - Unit: ${unitData.unit}
 - Theme: ${unitData.theme}
 - Communicative goals: ${unitData.intentions}
-- Grammar in focus (implicit, do NOT lecture about it): ${unitData.grammar}
+- Grammar in focus: ${unitData.grammar}
 - Suggested real-life scenario: ${unitData.scenario} (characters: ${unitData.characters})
 
 FOLLOW THE NATURAL APPROACH (Krashen):
-- Lead with communication and meaning, never with grammar explanations.
-- Ask contextualized questions that require the student to naturally produce the target grammar/vocabulary.
-- Mix in short, situational exercises and a light roleplay moment tied to the scenario above.
-- If the student makes a mistake, don't interrupt the flow harshly — acknowledge their message, gently
-  model the correct form in your reply, and briefly explain only if it's a recurring or meaningful error.
-- Keep the class conversational, warm, and short per turn (this is chat, not an essay).
-- Do NOT re-teach the grammar rule from scratch — assume the academy already did that today.
+- Lead with communication and meaning.
+- Ask contextualized questions that require natural use of the target grammar.
+- Mirror Effect: If they make a mistake, acknowledge and model the correct form naturally.
+- Keep the class conversational and warm.
 
-Start the class now: greet the student briefly, reference what they studied today in one sentence,
-and immediately open with a real, contextual question or micro-scenario that gets them talking.
+Start the class now: greet briefly, reference what they studied, and immediately open with a contextual question.
         `;
     }
 
-    // CASO B: el alumno escribió algo libre que no coincidió con ninguna unidad
     return `
-You are a complementary English communication coach, working alongside a formal academy course.
-The student just told you, in their own words, what they studied today: "${rawInput}".
-You don't have structured data for this, so infer the grammar/vocabulary focus directly from their message.
-
+You are a friendly English Coach. The student is practicing freely.
 FOLLOW THE NATURAL APPROACH (Krashen):
-- Lead with communication and meaning, never grammar explanations.
-- Ask contextualized questions that require them to naturally use what they mention they studied.
-- Include a short situational exercise or light roleplay moment.
-- Correct errors gently, in-flow, without breaking the conversation.
-- Keep turns short and conversational.
-
-Start the class now: greet briefly, reference what they said they studied, and open with a real question.
+- Be supportive, low-stress, and conversational.
+- Use the 'Mirror Effect' to correct grammar errors implicitly.
+- Keep the conversation flowing with open-ended questions about the student's interests or day.
     `;
 }
 
 async function startDailyCoachSession(userInput) {
-    // El input esperado desde el frontend: "Today I studied: Unit 5" o "Today I studied: Present Perfect"
     const cleanInput = userInput.replace("Today I studied:", "").trim();
-
-    // Búsqueda LOCAL, sin LLM — igual que pide el spec: nunca gastar API para "buscar unidades".
     const unitData = interpretTopic(cleanInput);
 
     dailyCoachSession = {
@@ -76,10 +68,20 @@ async function startDailyCoachSession(userInput) {
 async function generateDailyCoachResponse(session, userMessage, isInitiation) {
     const finalUserMessage = isInitiation ? "*Class begins*" : userMessage;
 
+    // --- PROTECCIÓN CONTRA 400 BAD REQUEST ---
+    // 1. Asegurar que haya un System Directive válido
+    const systemContent = (session.systemDirective && session.systemDirective.trim().length > 0) 
+                          ? session.systemDirective 
+                          : NATURAL_APPROACH_FALLBACK;
+
+    // 2. Construir mensajes sanitizados
     const messages = [
-        { role: "system", content: session.systemDirective },
-        ...(session.history || []),
-        { role: "user", content: finalUserMessage }
+        { role: "system", content: systemContent },
+        ...(session.history || []).map(m => ({ 
+            role: m.role, 
+            content: (m.content || "").toString().trim() 
+        })),
+        { role: "user", content: finalUserMessage.trim() }
     ];
 
     try {
@@ -91,7 +93,7 @@ async function generateDailyCoachResponse(session, userMessage, isInitiation) {
 
         return completion.choices[0].message.content;
     } catch (error) {
-        console.error("Error en Daily Coach:", error);
+        console.error("Error en Daily Coach:", error.error || error);
         return "Sorry, I had trouble preparing today's class. Let's try again!";
     }
 }

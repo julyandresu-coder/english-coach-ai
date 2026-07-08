@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const { orchestrator, addTurnToHistory } = require('./core/orchestrator.js');
 const { checkErrors } = require('./core/correctorEngine.js');
@@ -21,9 +22,21 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Endpoint to fetch Interchange 2 units
+app.get('/api/units', (req, res) => {
+  try {
+    const rawData = fs.readFileSync(path.join(__dirname, '../knowledge/interchange2.json'), 'utf8');
+    res.json(JSON.parse(rawData));
+  } catch (error) {
+    console.error("Error reading units:", error);
+    res.status(500).json({ error: "Failed to read units data" });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, mode, context } = req.body; 
+    console.log("Received chat request:", { mode, messageLength: message?.length });
     
     if (!message) return res.status(400).json({ error: "No message provided" });
 
@@ -45,7 +58,7 @@ app.post('/api/chat', async (req, res) => {
 
         const [actorResponse, correctionData] = await Promise.all([
             generateRoleResponse(session, message),
-            checkErrors(message, "Roleplay scenario: " + message)
+            checkErrors(message, "Roleplay scenario: " + (session.theme || "Open Conversation"))
         ]);
 
         addTurnToHistory(message, actorResponse);

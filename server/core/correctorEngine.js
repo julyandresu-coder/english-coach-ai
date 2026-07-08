@@ -8,7 +8,7 @@ async function checkErrors(userText, context = "General casual conversation") {
     }
 
     const prompt = `
-    You are a strict and expert English Fluency Coach for native Spanish speakers.
+    You are a strict and expert English Fluency Coach for Spanish speakers.
     The user is speaking into a microphone. The input is a raw Speech-to-Text transcript.
 
     CURRENT USER CONTEXT / SITUATION: "${context}"
@@ -24,7 +24,7 @@ async function checkErrors(userText, context = "General casual conversation") {
     {
       "hasErrors": true,
       "correction": "[Exact, fluent way a native speaker would say this in the given context]",
-      "explanation": "[In SPANISH: Briefly explain why it sounds weird and teach the natural expression]"
+      "explanation": "[In ENGLISH: Briefly explain why it sounds weird and teach the natural expression]"
     }
 
     Do NOT include markdown formatting. Return ONLY the raw JSON object.
